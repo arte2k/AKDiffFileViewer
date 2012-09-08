@@ -5,16 +5,20 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include  <QTextStream>
+#include <QKeySequence>
+#include <QApplication>
 #include "difffilesyntaxhighlighter.h"
 
 
 DiffViewerWindow::DiffViewerWindow()
 {
     openAction = new QAction(tr("&Open"), this);
+    openAction->setShortcut(QKeySequence::Open);
     exitAction = new QAction(tr("&Exit"), this);
+    exitAction->setShortcut(QKeySequence::Quit);
 
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    connect(exitAction, SIGNAL(triggered()), this, SLOT(quit()));
+    connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(openAction);
@@ -48,5 +52,5 @@ void DiffViewerWindow::open()
 
 void DiffViewerWindow::quit()
 {
-
+    qApp->quit();
 }

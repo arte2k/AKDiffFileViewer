@@ -2,9 +2,11 @@
 #define DIFFVIEWERWINDOW_H
 
 #include <QMainWindow>
+#include <QApplication>
 class QTextEdit;
 class QAction;
 class DiffFileSyntaxHighlighter;
+
 
 class DiffViewerWindow : public QMainWindow
 {

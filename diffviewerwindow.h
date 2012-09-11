@@ -31,8 +31,11 @@ private:
     QMenu*   fileMenu;
 
     DiffFileSyntaxHighlighter* diffFileHighlighter;
+    bool isNewCodeVisible;
+    bool isRemovedCodeVisible;
 
-    void removeTextMatchingRegexp(const QRegExp& regExp);
+    void removeText(bool removeNewCode,  bool isHiding);
+    void setBlockUserData();
 };
 
 #endif // DIFFVIEWERWINDOW_H

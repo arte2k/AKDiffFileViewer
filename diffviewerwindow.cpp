@@ -10,8 +10,9 @@
 #include "difffilesyntaxhighlighter.h"
 #include <iostream>
 #include <QPlainTextDocumentLayout>
+#include "diffblockuserdata.h"
 
-DiffViewerWindow::DiffViewerWindow()
+DiffViewerWindow::DiffViewerWindow():isNewCodeVisible(true), isRemovedCodeVisible(true)
 {
     openAction = new QAction(tr("&Open"), this);
     openAction->setShortcut(QKeySequence::Open);
@@ -53,23 +54,30 @@ void DiffViewerWindow::open()
             return;
         }
         QTextStream in(&file);
-//        QRegExp regExp("^\\+.*");
-//        for(QString line = in.readLine(); !line.isNull(); line = in.readLine())
-//        {
-//            if(!regExp.exactMatch(line))
-//            {
-//            }
-//        }
         textView->setPlainText(in.readAll());
-//        QRegExp regExp("^\\+.*");
-//        QTextCursor cursor = textView->document()->find(regExp);
-//        while(!cursor.isNull())
-//        {
-//            cursor.deleteChar();
-//            cursor = textView->document()->find(regExp);
-//        }
-        //cursor.block().setVisible(false);
         file.close();
+        setBlockUserData();
+    }
+}
+
+void DiffViewerWindow::setBlockUserData()
+{
+    QTextDocument* doc= textView->document();
+    QTextBlock block = doc->begin();
+    QRegExp regExpNewCode("^\\+[^\n]*");
+    QRegExp regExpRemovedCode("^\\-[^\n]*");
+    while(block.isValid())
+    {
+        QTextCursor cursor(block);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        block = block.next();
+        if(regExpNewCode.exactMatch(cursor.selectedText()))
+        {
+            cursor.block().setUserData(new DiffBlockUserData(true,cursor.block().lineCount()));
+        } else if(regExpRemovedCode.exactMatch(cursor.selectedText()))
+        {
+            cursor.block().setUserData(new DiffBlockUserData(false,cursor.block().lineCount()));
+        }
     }
 }
 
@@ -80,31 +88,49 @@ void DiffViewerWindow::quit()
 
 void DiffViewerWindow::removeAddedCodeFromView()
 {
-    QRegExp regExp("^\\+[^\n]*");
-    removeTextMatchingRegexp(regExp);
+    if(isNewCodeVisible)
+        removeText(true, true);
+    else
+        removeText(true, false);
+    isNewCodeVisible = !isNewCodeVisible;
 }
 
 void DiffViewerWindow::removeRemovedCodeFromView()
 {
-    QRegExp regExp("^\\-[^\n]*");
-    removeTextMatchingRegexp(regExp);
+    if(isRemovedCodeVisible)
+        removeText(false, true);
+    else
+        removeText(false, false);
+    isRemovedCodeVisible = !isRemovedCodeVisible;
 }
 
-void DiffViewerWindow::removeTextMatchingRegexp(const QRegExp& regExp)
+void DiffViewerWindow::removeText(bool removeNewCode, bool isHiding)
 {
     QTextDocument* doc= textView->document();
     QPlainTextDocumentLayout* layout  = qobject_cast<QPlainTextDocumentLayout*>(textView->document()->documentLayout());
     QTextBlock block = doc->begin();
     while(block.isValid())
     {
-        QTextCursor cursor(block);
-        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-        block = block.next();
-        if(regExp.exactMatch(cursor.selectedText()))
+        DiffBlockUserData* userData = static_cast<DiffBlockUserData*>(block.userData());
+        if(userData != NULL)
         {
-            cursor.block().setVisible(false);
-            cursor.block().setLineCount(0);
+            if((userData->isNewCode() && removeNewCode) || (!userData->isNewCode() && !removeNewCode))
+            {
+                if(isHiding)
+                {
+                    block.setVisible(false);
+                    block.setLineCount(0);
+                }
+                else
+                {
+                    block.setVisible(true);
+                    block.setLineCount(userData->getLineCount());
+
+                }
+            }
         }
+        block = block.next();
+
     }
     layout->requestUpdate();
 }

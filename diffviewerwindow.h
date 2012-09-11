@@ -15,8 +15,8 @@ public:
     explicit DiffViewerWindow();
 private slots:
     void open();
-    void removeAddedCodeFromView();
-    void removeRemovedCodeFromView();
+    void toogleAddedCode();
+    void toogleRemovedCode();
     void quit();
 
 signals:
@@ -34,7 +34,7 @@ private:
     bool isNewCodeVisible;
     bool isRemovedCodeVisible;
 
-    void removeText(bool removeNewCode,  bool isHiding);
+    void toogleTextChanges(bool removeNewCode,  bool hideCode);
     void setBlockUserData();
 };
 

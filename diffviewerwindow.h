@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QApplication>
-class QTextEdit;
+class QPlainTextEdit;
 class QAction;
 class DiffFileSyntaxHighlighter;
 
@@ -15,19 +15,24 @@ public:
     explicit DiffViewerWindow();
 private slots:
     void open();
+    void removeAddedCodeFromView();
+    void removeRemovedCodeFromView();
     void quit();
 
 signals:
     
 public slots:
 private:
-    QTextEdit* textView;
-
+    QPlainTextEdit* textView;
+    QAction* onlyRemovedCodeAction;
+    QAction* onlyAddedCodeAction;
     QAction* openAction;
     QAction* exitAction;
     QMenu*   fileMenu;
 
     DiffFileSyntaxHighlighter* diffFileHighlighter;
+
+    void removeTextMatchingRegexp(const QRegExp& regExp);
 };
 
 #endif // DIFFVIEWERWINDOW_H

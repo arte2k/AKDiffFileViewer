@@ -3,10 +3,13 @@
 
 #include <QSyntaxHighlighter>
 #include <vector>
+
+class QPlainTextEdit;
+
 class DiffFileSyntaxHighlighter : public QSyntaxHighlighter
 {
 public:
-    DiffFileSyntaxHighlighter(QTextEdit *parent);
+    DiffFileSyntaxHighlighter(QPlainTextEdit *parent);
 protected:
     void highlightBlock(const QString& text);
 private:

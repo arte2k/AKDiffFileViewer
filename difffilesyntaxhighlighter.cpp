@@ -2,8 +2,9 @@
 #include <QSyntaxHighlighter>
 #include <QRegExp>
 #include <QString>
+#include <QPlainTextEdit>
 
-DiffFileSyntaxHighlighter::DiffFileSyntaxHighlighter(QTextEdit * parent):QSyntaxHighlighter(parent)
+DiffFileSyntaxHighlighter::DiffFileSyntaxHighlighter(QPlainTextEdit * parent):QSyntaxHighlighter(parent->document())
 {
     HighlightingRule rule;
 

@@ -1,4 +1,4 @@
 AKDiffFileViewer
 ================
 
-Diff file viewer for git
+Diff file viewer with possilibty to hide added/removed code
